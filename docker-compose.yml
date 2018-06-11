@@ -1,0 +1,38 @@
+version: '2'
+services:
+
+  # The Application
+  app:
+    build:
+      context: ./
+      dockerfile: app.dockerfile
+    working_dir: /var/www
+    volumes:
+      - ./laravel:/var/www
+
+  # The Web Server
+  web:
+    build:
+      context: ./
+      dockerfile: web.dockerfile
+    working_dir: /var/www
+    volumes_from:
+      - app
+    ports:
+      - 8080:80
+
+  # The Database
+  database:
+    image: postgres:10-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: laraveldb
+      POSTGRES_USER: laraveluser
+      POSTGRES_PASSWORD: laravelpassword
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+volumes:
+  db_data:
